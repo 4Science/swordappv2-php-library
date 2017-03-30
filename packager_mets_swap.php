@@ -35,6 +35,9 @@ class PackagerMetsSwap {
     // Identifier
     public $sac_identifier;
 
+    // Relations
+    public $sac_relations; 
+    
     // Date made available
     public $sac_dateavailable;
 
@@ -79,6 +82,7 @@ class PackagerMetsSwap {
         $this->sac_root_out = $sac_rootout;
         $this->sac_file_out = $sac_fileout;
         $this->sac_creators = array();
+        $this->sac_relations = array();
         $this->sac_subjects = array();
         $this->sac_files = array();
         $this->sac_mimetypes = array();
@@ -102,6 +106,10 @@ class PackagerMetsSwap {
     function addCreator($sac_creator) {
         array_push($this->sac_creators, $this->clean($sac_creator));
     }
+    
+    function addRelation($sac_relation) {
+        array_push($this->sac_relations, $this->clean($sac_relation));
+    }    
 
     function addSubject($sac_subject) {
         array_push($this->sac_subjects, $this->clean($sac_subject));
@@ -173,6 +181,9 @@ class PackagerMetsSwap {
             case "publisher":
                 $this->setPublisher($sac_thevalue);
                 break;
+            case "relation":
+                $this->addRelation($sac_thevalue);
+                break;                
             case "title":
                 $this->setTitle($sac_thevalue);
                 break;
@@ -246,7 +257,7 @@ class PackagerMetsSwap {
             $this->statement($fh,
                              "http://purl.org/dc/elements/1.1/creator",
                              $this->valueString($sac_creator));
-        }
+        }              
 
         foreach ($this->sac_subjects as $sac_subject) {
             $this->statement($fh,
@@ -277,6 +288,12 @@ class PackagerMetsSwap {
                              "http://purl.org/dc/elements/1.1/publisher",
                              $this->valueString($this->sac_publisher));
         }
+        
+        foreach ($this->sac_relations as $sac_relation) {
+            $this->statement($fh,
+                             "http://purl.org/dc/elements/1.1/relation",
+                             $this->valueString($sac_relation));
+        }         
 
         fwrite($fh, "<epdcx:statement epdcx:propertyURI=\"http://purl.org/eprint/terms/isExpressedAs\" " .
                     "epdcx:valueRef=\"sword-mets-expr-1\" />\n");
